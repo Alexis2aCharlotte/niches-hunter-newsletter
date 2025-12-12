@@ -223,17 +223,24 @@ export function generateNewsletterHTML(data: NewsletterAnalysis): string {
               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#111;border-radius:20px;overflow:hidden;">
                 <tr>
                   <td style="padding:28px;">
-                    <div style="font-size:11px;color:#00FF88;font-weight:700;letter-spacing:2px;margin-bottom:12px;text-transform:uppercase;">
+                    <div style="font-size:11px;color:#00FF88;font-weight:700;letter-spacing:2px;margin-bottom:16px;text-transform:uppercase;">
                       ⚡ Your Move
                     </div>
-                    <p style="font-size:16px;color:#fff;font-weight:500;line-height:1.7;margin:0 0 20px;">
+                    <!-- Short teaser -->
+                    <p style="font-size:18px;color:#fff;font-weight:600;line-height:1.5;margin:0 0 20px;">
                       ${data.action}
                     </p>
+                    <!-- What's hidden -->
+                    <div style="background:#1a1a1a;border-radius:8px;padding:12px 16px;margin-bottom:20px;border:1px dashed #333;">
+                      <div style="font-size:12px;color:#666;">
+                        🔒 <span style="color:#888;">Step-by-step • Competitors • Keywords • Strategy</span>
+                      </div>
+                    </div>
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td style="background:#00CC6A;border-radius:10px;text-align:center;">
-                          <a href="https://nicheshunter.app/pro" style="display:block;padding:14px 24px;color:#000;font-size:14px;font-weight:700;text-decoration:none;">
-                            Unlock all niches & data →
+                          <a href="https://nicheshunter.app/pro" style="display:block;padding:16px 24px;color:#000;font-size:15px;font-weight:700;text-decoration:none;">
+                            Unlock full market data →
                           </a>
                         </td>
                       </tr>

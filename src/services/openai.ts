@@ -157,7 +157,7 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
 3. Use REAL data only (ranks, countries, number of apps by dev)
 4. Write EVERYTHING in ENGLISH
 5. Be SPECIFIC with numbers and insights
-6. Focus on ACTIONABLE opportunities for indie devs
+6. Focus on ACTIONABLE opportunities for developers
 7. NEVER use technical column names like "dev_app_count", "cluster_size", "category_apps_count" etc. in your text. Write naturally for humans.
 
 === OUTPUT FORMAT (JSON ONLY, no markdown) ===
@@ -217,7 +217,7 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
     }
   ],
   
-  "action": "One specific, actionable recommendation. What should a developer build THIS WEEK based on these patterns? Be concrete: mention the niche, the differentiator, the target market and 3 steps. Trigger user to click on the pro subscription to get the full details."
+  "action": "MAX 15 WORDS. Must be DIRECTLY linked to Niche #1 above. Format: 'Build a [app from niche 1] for [market from the data] with [feature inspired by the gap]...' Use the REAL niche name and country from your analysis. STOP after 15 words."
 }
 
 IMPORTANT: 
