@@ -154,11 +154,11 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
 === RULES ===
 1. NICHE-FIRST: Start by identifying the 2 best niches from the clusters
 2. Pick apps that ILLUSTRATE each niche (2 apps for niche 1, 1 app for niche 2)
-3. Use REAL data only (ranks, countries, dev_app_count)
-4. "indie" = dev_app_count of 1, "small_studio" = 2-3, "publisher" = 4+
-5. Write EVERYTHING in ENGLISH
-6. Be SPECIFIC with numbers and insights
-7. Focus on ACTIONABLE opportunities for indie devs
+3. Use REAL data only (ranks, countries, number of apps by dev)
+4. Write EVERYTHING in ENGLISH
+5. Be SPECIFIC with numbers and insights
+6. Focus on ACTIONABLE opportunities for indie devs
+7. NEVER use technical column names like "dev_app_count", "cluster_size", "category_apps_count" etc. in your text. Write naturally for humans.
 
 === OUTPUT FORMAT (JSON ONLY, no markdown) ===
 {
@@ -183,7 +183,7 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
           "country": "US",
           "flag": "🇺🇸",
           "dev_type": "indie",
-          "insight": "Why this app proves the opportunity. Mention dev_app_count, rank, countries. One punchy sentence. explain why it's good to copy it and how to improve it."
+          "insight": "Why this app proves the opportunity. Say if it's a solo dev or small team, mention rank and countries. One punchy sentence. Explain why it's good to copy and how to improve it."
         },
         {
           "name": "Second app for niche 1",
@@ -217,7 +217,7 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
     }
   ],
   
-  "action": "One specific, actionable recommendation. What should a dev build THIS WEEK based on these patterns? Be concrete: mention the niche, the differentiator, the target market. Trigger user to click on the pro subscription"
+  "action": "One specific, actionable recommendation. What should a developer build THIS WEEK based on these patterns? Be concrete: mention the niche, the differentiator, the target market and 3 steps. Trigger user to click on the pro subscription to get the full details."
 }
 
 IMPORTANT: 
