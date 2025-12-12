@@ -1,7 +1,7 @@
-import { NewsletterAnalysis } from '../services/openai';
+import { NewsletterAnalysis, Niche, AppInNiche } from '../services/openai';
 
 /**
- * Category colors for apps
+ * Category colors for niches
  */
 const categoryColors: Record<string, string> = {
   'Entertainment': '#9B59B6',
@@ -14,173 +14,255 @@ const categoryColors: Record<string, string> = {
   'Lifestyle': '#FF6B6B',
   'Education': '#5DADE2',
   'Shopping': '#FF9F43',
+  'Reference': '#8E44AD',
+  'Utilities': '#3498DB',
+  'Weather': '#5DADE2',
+  'Books': '#E67E22',
+  'Sports': '#27AE60',
+  'Music': '#E91E63',
+  'Travel': '#1ABC9C',
+  'Food & Drink': '#F39C12',
+  'News': '#34495E',
   'default': '#00CC6A'
 };
 
 function getCategoryColor(category: string): string {
-  return categoryColors[category] || categoryColors['default'];
-}
-
-function getScoreColor(score: number): string {
-  if (score >= 80) return '#00CC6A';
-  if (score >= 60) return '#F39C12';
-  if (score >= 40) return '#FF9F43';
-  return '#E74C3C';
-}
-
-function progressBar(percent: number): string {
-  const filled = Math.round(percent / 10);
-  const empty = 10 - filled;
-  const color = getScoreColor(percent);
-  return '<span style="font-family:monospace;white-space:nowrap;font-size:10px;letter-spacing:-1px;">' +
-    '<span style="color:' + color + ';">' + '▮'.repeat(filled) + '</span>' +
-    '<span style="color:#e0e0e0;" class="dm-text-muted-dark">' + '▮'.repeat(empty) + '</span> ' +
-    '<span style="font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#888;font-weight:400;letter-spacing:0;" class="dm-text-muted">' + percent + '%</span>' +
-    '</span>';
-}
-
-function toLineBreaks(text: string): string {
-  const sentences = text.split(/\.\s+(?=[A-Z])/).filter(s => s.trim());
-  if (sentences.length <= 1) return text;
-
-  return sentences.map(s => {
-    let sentence = s.trim();
-    if (!sentence.endsWith('.')) sentence += '.';
-    return sentence;
-  }).join('<br><br>');
-}
-
-function toBulletPoints(text: string): string {
-  const sentences = text.split(/\.\s+(?=[A-Z])/).filter(s => s.trim());
-  if (sentences.length <= 1) {
-    return '<p style="margin:0;color:#333;font-size:15px;line-height:1.6;" class="dm-text-body">' + text + '</p>';
+  for (const [key, color] of Object.entries(categoryColors)) {
+    if (category.toLowerCase().includes(key.toLowerCase())) {
+      return color;
+    }
   }
-
-  let html = '<ul style="margin:0;padding-left:18px;color:#333;font-size:15px;line-height:1.7;" class="dm-text-body">';
-  for (const s of sentences) {
-    let sentence = s.trim();
-    if (!sentence.endsWith('.')) sentence += '.';
-    html += '<li style="margin-bottom:8px;">' + sentence + '</li>';
-  }
-  html += '</ul>';
-  return html;
+  return categoryColors['default'];
 }
 
 /**
- * Generate newsletter HTML from AI analysis
+ * Generate niche card - BIG, DISTINCT, CLEAR
  */
-export function generateNewsletterHTML(data: NewsletterAnalysis): string {
-  // INSIGHTS
-  let insightsHtml = '';
-  for (const insight of data.insights) {
-    insightsHtml += '<li style="margin-bottom:16px;padding-left:8px;line-height:1.6;" class="dm-text-body">' + insight + '</li>';
+function generateNicheCard(niche: Niche, index: number): string {
+  const color = getCategoryColor(niche.name);
+  const nicheNumber = index + 1;
+  
+  // Build apps list - simple, punchy
+  let appsListHtml = '';
+  for (const app of niche.apps) {
+    appsListHtml += `
+      <tr>
+        <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td style="font-size:15px;font-weight:600;color:#111;">${app.name}</td>
+              <td style="text-align:right;font-size:13px;color:#888;">#${app.rank} ${app.flag}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-size:13px;color:#666;padding-top:4px;line-height:1.5;">${app.insight}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    `;
   }
 
-  // APPS
-  let appsHtml = '';
-  for (const app of data.apps) {
-    const catColor = getCategoryColor(app.category);
+  return `
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- NICHE ${nicheNumber} -->
+    <!-- ═══════════════════════════════════════════ -->
+    <tr>
+      <td style="padding:0 0 32px;">
+        
+        <!-- Niche Card -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.06);">
+          
+          <!-- Niche Header - Big & Bold -->
+          <tr>
+            <td style="background:${color};padding:24px 28px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Niche #${nicheNumber}</div>
+                    <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;">${niche.emoji} ${niche.name}</div>
+                    <div style="font-size:14px;color:rgba(255,255,255,0.85);">${niche.cluster_size} apps spotted today</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-    appsHtml += '<div style="margin-bottom:32px;padding-left:16px;border-left:3px solid ' + catColor + ';">';
-    appsHtml += '<div style="margin-bottom:4px;white-space:nowrap;">';
-    appsHtml += '<span style="font-size:18px;font-weight:700;color:#111;" class="dm-text-white">' + app.name + '</span>';
-    appsHtml += '<span style="font-size:13px;color:#888;margin-left:8px;" class="dm-text-muted">#' + app.rank + ' ' + app.flag + '</span>';
-    appsHtml += '</div>';
-    appsHtml += '<div style="font-size:13px;color:' + catColor + ';margin-bottom:10px;font-weight:500;">' + app.category + ' • ' + app.market + '</div>';
-    appsHtml += '<p style="margin:0 0 12px 0;font-size:15px;color:#333;line-height:1.7;" class="dm-text-body">' + toLineBreaks(app.opportunity) + '</p>';
-    appsHtml += '<div style="font-size:12px;color:#888;" class="dm-text-muted">Potential: ' + progressBar(app.potential) + '</div>';
-    appsHtml += '</div>';
-  }
+          <!-- Intro -->
+          <tr>
+            <td style="padding:24px 28px 0;">
+              <p style="margin:0;font-size:15px;color:#444;line-height:1.7;">${niche.intro}</p>
+            </td>
+          </tr>
 
-  // NICHES
-  let nichesHtml = '';
-  for (const niche of data.niches) {
-    const potColor = getScoreColor(niche.potentialScore);
+          <!-- The Opportunity -->
+          <tr>
+            <td style="padding:20px 28px;">
+              <div style="background:#f0fdf4;border-radius:12px;padding:20px;border-left:4px solid #00CC6A;">
+                <div style="font-size:12px;font-weight:700;color:#00CC6A;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔥 The Opportunity</div>
+                <p style="margin:0;font-size:15px;color:#166534;line-height:1.6;font-weight:500;">${niche.why_hot}</p>
+              </div>
+            </td>
+          </tr>
 
-    nichesHtml += '<div style="margin-bottom:32px;padding:20px;background:#fafafa;border-radius:8px;border-left:4px solid ' + potColor + ';" class="dm-card">';
-    nichesHtml += '<h3 style="font-size:18px;margin:0 0 10px 0;color:#111;font-weight:700;" class="dm-text-white">' + niche.title + '</h3>';
-    nichesHtml += '<div style="margin-bottom:14px;font-size:12px;color:#666;display:flex;gap:20px;flex-wrap:wrap;" class="dm-text-muted">';
-    nichesHtml += '<span>Comp: ' + progressBar(niche.competitionScore) + '</span>';
-    nichesHtml += '<span>Pot: ' + progressBar(niche.potentialScore) + '</span>';
-    nichesHtml += '</div>';
-    nichesHtml += toBulletPoints(niche.description);
-    nichesHtml += '</div>';
-  }
+          <!-- The Weakness to Exploit -->
+          <tr>
+            <td style="padding:0 28px 20px;">
+              <div style="background:#fef3c7;border-radius:12px;padding:20px;border-left:4px solid #f59e0b;">
+                <div style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💡 Weakness to Exploit</div>
+                <p style="margin:0;font-size:15px;color:#92400e;line-height:1.6;">${niche.gap}</p>
+              </div>
+            </td>
+          </tr>
 
-  // CSS STYLES
-  const cssStyles = `
-  <style>
-    :root { color-scheme: light dark; supported-color-schemes: light dark; }
-    body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: #ffffff; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    
-    @media only screen and (max-width: 480px) {
-      .container { padding: 16px !important; width: 100% !important; }
-    }
+          <!-- Apps Examples -->
+          <tr>
+            <td style="padding:0 28px 24px;">
+              <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📱 Apps in this niche</div>
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                ${appsListHtml}
+              </table>
+            </td>
+          </tr>
 
-    @media (prefers-color-scheme: dark) {
-      body, .bg-body { background-color: #000000 !important; color: #e0e0e0 !important; }
-      .container { background-color: #000000 !important; }
-      .dm-text-white { color: #ffffff !important; }
-      .dm-text-body { color: #d0d0d0 !important; }
-      .dm-text-muted { color: #888888 !important; }
-      .dm-text-muted-dark { color: #444444 !important; }
-      .dm-border { border-color: #333333 !important; }
-      .dm-bg-summary { border-left-color: #00CC6A !important; background-color: rgba(0,204,106,0.05) !important; }
-      .dm-action-box { background-color: #1a1a1a !important; border: 1px solid #333 !important; }
-      .dm-card { background-color: #111 !important; }
-    }
-  </style>
-`;
+          <!-- CTA -->
+          <tr>
+            <td style="padding:0 28px 28px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="background:#111;border-radius:12px;text-align:center;">
+                    <a href="https://nicheshunter.app/niches/${encodeURIComponent(niche.name.toLowerCase().replace(/\s+/g, '-'))}" style="display:block;padding:16px 24px;color:#00FF88;font-size:14px;font-weight:700;text-decoration:none;">
+                      See full data & competitors →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-  // BUILD HTML
-  let html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">';
-  html += '<meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark">';
-  html += cssStyles + '</head><body class="bg-body">';
-
-  html += '<div class="container">';
-
-  // HEADER
-  html += '<div style="padding-bottom:24px; text-align:center;">';
-  html += '<div style="font-size:11px;font-weight:700;color:#00CC6A;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Niches Hunter</div>';
-  html += '<h1 style="font-size:24px;font-weight:800;color:#111;margin:0 0 8px 0;letter-spacing:-0.5px;line-height:1.3;" class="dm-text-white">' + data.title + '</h1>';
-  html += '<div style="font-size:14px;color:#888;" class="dm-text-muted">' + data.date + ' • Daily Intel</div>';
-  html += '</div>';
-
-  // SUMMARY
-  html += '<div style="margin-bottom:32px;padding:16px 20px;background:rgba(0,204,106,0.06);border-left:3px solid #00CC6A;border-radius:0 8px 8px 0;" class="dm-bg-summary">';
-  html += '<p style="margin:0;font-size:15px;font-style:italic;color:#444;line-height:1.7;" class="dm-text-body">' + data.summary + '</p>';
-  html += '</div>';
-
-  const sectionHeaderStyle = 'font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;border-bottom:1px solid #eee;padding-bottom:8px;margin:32px 0 20px 0;';
-
-  // KEY INSIGHTS
-  html += '<div style="' + sectionHeaderStyle + '" class="dm-text-muted dm-border">💡 Key Insights</div>';
-  html += '<ul style="padding-left:16px;margin:0;color:#333;font-size:15px;" class="dm-text-body">' + insightsHtml + '</ul>';
-
-  // APPS
-  html += '<div style="' + sectionHeaderStyle + '" class="dm-text-muted dm-border">📱 Zoom on the Apps</div>';
-  html += appsHtml;
-
-  // NICHES
-  html += '<div style="' + sectionHeaderStyle + '" class="dm-text-muted dm-border">🎯 Niches to Explore</div>';
-  html += nichesHtml;
-
-  // ACTION
-  html += '<div style="margin-top:40px;background:#111;color:#fff;padding:24px;border-radius:8px;" class="dm-action-box">';
-  html += '<div style="font-size:11px;font-weight:700;color:#00CC6A;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">⚡ Action of the day</div>';
-  html += '<p style="margin:0;font-size:15px;line-height:1.6;color:#fff;" class="dm-text-white">' + data.action + '</p>';
-  html += '</div>';
-
-  // FOOTER
-  html += '<div style="margin-top:40px;padding-top:20px;border-top:1px solid #eee;text-align:center;font-size:12px;color:#aaa;" class="dm-border dm-text-muted">';
-  html += '<a href="https://nicheshunter.app" style="color:#00CC6A;text-decoration:none;font-weight:600;">Niches Hunter</a> • Daily Intelligence';
-  html += '<br><br>';
-  html += '<a href="https://nicheshunter.app/unsubscribe" style="color:#999;text-decoration:underline;font-size:11px;">Unsubscribe</a>';
-  html += '</div>';
-
-  html += '</div></body></html>';
-
-  return html;
+        </table>
+      </td>
+    </tr>
+  `;
 }
 
+/**
+ * Generate newsletter HTML - CLEAN, HIERARCHY, TRIGGER
+ */
+export function generateNewsletterHTML(data: NewsletterAnalysis): string {
+  // Generate niches HTML
+  let nichesHtml = '';
+  data.niches.forEach((niche, index) => {
+    nichesHtml += generateNicheCard(niche, index);
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="color-scheme" content="light dark">
+  <title>Niches Hunter - Daily Brief</title>
+  <!--[if mso]><xml>
+  <w:WordDocument xmlns:w="urn:schemas-microsoft-com:office:word">
+    <w:DontUseAdvancedTypographyReadingMail/>
+  </w:WordDocument>
+  </xml><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:32px 16px;background-color:#f5f5f7;">
+    <tr>
+      <td align="center">
+        <!-- Main Container -->
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="max-width:560px;">
+          
+          <!-- Logo -->
+          <tr>
+            <td style="text-align:center;padding-bottom:24px;">
+              <div style="display:inline-block;background:#111;padding:10px 20px;border-radius:100px;">
+                <span style="letter-spacing:2px;font-size:12px;font-weight:700;color:#00FF88;">
+                  🎯 NICHES HUNTER
+                </span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Header Card -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.06);">
+                <tr>
+                  <td style="padding:32px 28px;text-align:center;">
+                    <div style="font-size:13px;color:#888;margin-bottom:12px;">${data.date}</div>
+                    <h1 style="margin:0 0 16px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;line-height:1.25;">
+                      ${data.title}
+                    </h1>
+                    <p style="margin:0;font-size:16px;color:#444;line-height:1.6;">
+                      ${data.hook}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Section Label -->
+          <tr>
+            <td style="padding:8px 0 20px;">
+              <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;text-align:center;">
+                Today's Opportunities
+              </div>
+            </td>
+          </tr>
+
+          <!-- NICHES -->
+          ${nichesHtml}
+
+          <!-- Action Card -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#111;border-radius:20px;overflow:hidden;">
+                <tr>
+                  <td style="padding:28px;">
+                    <div style="font-size:11px;color:#00FF88;font-weight:700;letter-spacing:2px;margin-bottom:12px;text-transform:uppercase;">
+                      ⚡ Your Move
+                    </div>
+                    <p style="font-size:16px;color:#fff;font-weight:500;line-height:1.7;margin:0 0 20px;">
+                      ${data.action}
+                    </p>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="background:#00CC6A;border-radius:10px;text-align:center;">
+                          <a href="https://nicheshunter.app/pro" style="display:block;padding:14px 24px;color:#000;font-size:14px;font-weight:700;text-decoration:none;">
+                            Unlock all niches & data →
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="text-align:center;padding:16px;">
+              <p style="margin:0 0 8px;font-size:14px;color:#666;">
+                Happy hunting 🚀
+              </p>
+              <a href="https://nicheshunter.app" style="text-decoration:none;font-size:13px;font-weight:600;color:#00CC6A;">
+                nicheshunter.app
+              </a>
+              <p style="margin:16px 0 0;">
+                <a href="https://nicheshunter.app/unsubscribe" style="color:#999;text-decoration:underline;font-size:11px;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}

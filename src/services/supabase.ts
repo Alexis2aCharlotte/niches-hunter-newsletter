@@ -73,10 +73,12 @@ export async function saveNewsletter(content: string, title: string): Promise<vo
 
 /**
  * Get all active subscribers
+ * 
+ * ⚠️ TABLE DE TEST - Changer pour 'newsletter_subscribers' en production
  */
 export async function getActiveSubscribers(): Promise<Subscriber[]> {
   const { data, error } = await getSupabase()
-    .from('newsletter_subscribers')
+    .from('newsletter_subscribers_test')  // 🔒 TEST MODE - ton email uniquement
     .select('*')
     .eq('status', 'subscribed');
 

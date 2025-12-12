@@ -45,7 +45,7 @@ export async function generateNewsletter(): Promise<void> {
 
     // Step 3: Analyze with AI
     console.log('');
-    console.log('🤖 Step 3: Analyzing with OpenAI GPT-4o...');
+    console.log('🤖 Step 3: Analyzing with OpenAI GPT-5.1...');
     const analysis = await analyzeWithAI(opportunitiesText);
     console.log(`   ✅ Analysis complete`);
     console.log(`   📌 Title: "${analysis.title}"`);
