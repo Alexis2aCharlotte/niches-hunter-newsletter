@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-# Exécute directement la génération de newsletter (pas de serveur)
-startCommand = "npm run build && npm run generate"
+# Exécute directement la génération de newsletter avec tsx
+startCommand = "npx tsx src/generate.ts"
 restartPolicyType = "never"
