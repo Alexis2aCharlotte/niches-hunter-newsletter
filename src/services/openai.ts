@@ -162,13 +162,13 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
 
 === OUTPUT FORMAT (JSON ONLY, no markdown) ===
 {
-  "title": "Catchy title with emoji referencing the main pattern (max 60 chars)",
+  "title": "Catchy, simple title with emoji that anyone can understand (max 60 chars). Example: 'Prayer Apps Are Exploding 📿' or 'Calorie Trackers Dominate 🔥'",
   "date": "${today}",
   "hook": "One punchy sentence: what pattern did you find and why it matters. Use numbers.",
   
   "niches": [
     {
-      "name": "Niche name from cluster (use catchy name)",
+      "name": "Simple, clear niche name that anyone can understand. Examples: 'Bible & Prayer Apps', 'Calorie Trackers', 'Knitting Pattern Tools'. NO jargon like 'Smart Reference Utilities'.",
       "emoji": "Relevant emoji",
       "cluster_size": 6,
       "intro": "1-2 lines explaining what this niche is about. Simple, clear definition for someone who doesn't know this market.",
@@ -196,7 +196,7 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
       ]
     },
     {
-      "name": "Second niche name",
+      "name": "Simple, clear niche name (e.g., 'Walking Rewards Apps', 'Weather Widgets')",
       "emoji": "📱",
       "cluster_size": 4,
       "intro": "1-2 lines explaining this second niche.",
