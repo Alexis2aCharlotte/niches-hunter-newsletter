@@ -130,7 +130,7 @@ function generateNicheCard(niche: Niche, index: number): string {
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="background:#111;border-radius:12px;text-align:center;">
-                    <a href="https://nicheshunter.app/niches/${encodeURIComponent(niche.name.toLowerCase().replace(/\s+/g, '-'))}" style="display:block;padding:16px 24px;color:#00FF88;font-size:14px;font-weight:700;text-decoration:none;">
+                    <a href="https://nicheshunter.app/niches" style="display:block;padding:16px 24px;color:#00FF88;font-size:14px;font-weight:700;text-decoration:none;">
                       See full data & competitors →
                     </a>
                   </td>
@@ -239,7 +239,7 @@ export function generateNewsletterHTML(data: NewsletterAnalysis): string {
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td style="background:#00CC6A;border-radius:10px;text-align:center;">
-                          <a href="https://nicheshunter.app/pro" style="display:block;padding:16px 24px;color:#000;font-size:15px;font-weight:700;text-decoration:none;">
+                          <a href="https://nicheshunter.app/niches" style="display:block;padding:16px 24px;color:#000;font-size:15px;font-weight:700;text-decoration:none;">
                             Unlock full market data →
                           </a>
                         </td>
