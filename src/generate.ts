@@ -99,7 +99,7 @@ export async function generateNewsletter(): Promise<void> {
     // Step 2: Get daily picks (excluding cooldown)
     // =========================================
     console.log('📥 Step 2: Fetching daily picks from Supabase...');
-    const dailyPicks = await getDailyPicks(30, cooldownAppIds);
+    const dailyPicks = await getDailyPicks(50, cooldownAppIds);
     
     if (dailyPicks.length === 0) {
       console.log('⚠️  No daily picks found (all in cooldown?). Skipping newsletter generation.');
