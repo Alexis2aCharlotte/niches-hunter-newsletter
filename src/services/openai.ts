@@ -157,8 +157,9 @@ Find the 2 most interesting NICHES based on the clusters data, then select apps 
 3. Use REAL data only (ranks, countries, number of apps by dev)
 4. Write EVERYTHING in ENGLISH
 5. Be SPECIFIC with numbers and insights
-6. Focus on ACTIONABLE opportunities for developers
+6. Focus on ACTIONABLE opportunities for indie developers
 7. NEVER use technical column names like "dev_app_count", "cluster_size", "category_apps_count" etc. in your text. Write naturally for humans.
+8. IGNORE apps from big corporations: banks (N26, Revolut, PayPal...), big tech (Google, Apple, Microsoft, Meta...), famous brands (DeepL, Spotify, Netflix, Uber, CarPlay...). Only select apps from small teams or indie devs.
 
 === OUTPUT FORMAT (JSON ONLY, no markdown) ===
 {
