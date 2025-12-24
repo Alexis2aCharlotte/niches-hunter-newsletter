@@ -14,7 +14,7 @@ function getResend(): Resend {
   return resend;
 }
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Niches Hunter <support@arianeconcept.fr>';
+const FROM_EMAIL = 'Niches Hunter <support@arianeconcept.fr>';
 
 /**
  * Delay helper
