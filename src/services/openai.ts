@@ -135,7 +135,7 @@ export function formatDataForAI(items: any[]): string {
 // ============================================
 
 /**
- * Analyze app data with OpenAI - NICHE-FIRST approach
+ * Analyze app data with OpenAI - DEAL SPOTTER approach
  */
 export async function analyzeWithAI(opportunitiesText: string): Promise<NewsletterAnalysis> {
   const today = new Date().toLocaleDateString('en-US', { 
@@ -144,89 +144,128 @@ export async function analyzeWithAI(opportunitiesText: string): Promise<Newslett
     day: 'numeric' 
   });
 
-  const prompt = `You are an App Store analyst to spot profitable niche. Analyze this data and find PATTERNS.
+  const prompt = `You are a DEAL SPOTTER for indie developers. Your job is to find profitable app opportunities that others miss.
 
 ${opportunitiesText}
 
-=== YOUR MISSION ===
-Find the 2 most interesting NICHES based on the clusters data, then select apps that illustrate each niche.
+=== YOUR MINDSET ===
+Think like an indie dev looking for their next $5K/month app.
+You're not a market analyst - you're a treasure hunter finding REAL opportunities.
 
-=== RULES ===
-1. NICHE-FIRST: Start by identifying the 2 best niches from the clusters
-2. Pick apps that ILLUSTRATE each niche (2 apps for niche 1, 1 app for niche 2)
-3. Use REAL data only (ranks, countries, number of apps by dev)
-4. Write EVERYTHING in ENGLISH
-5. Be SPECIFIC with numbers and insights
-6. Focus on ACTIONABLE opportunities for indie developers
-7. NEVER use technical column names like "dev_app_count", "cluster_size", "category_apps_count" etc. in your text. Write naturally for humans.
-8. IGNORE apps from big corporations: banks (N26, Revolut, PayPal...), big tech (Google, Apple, Microsoft, Meta...), famous brands (DeepL, Spotify, Netflix, Uber, CarPlay...). Only select apps from small teams or indie devs.
+A GOOD DEAL has:
+✅ Proof it works (apps already ranking with small teams)
+✅ Low barrier to entry (1 dev can build it in < 3 months)
+✅ Clear path to $1K-10K MRR (subscription, IAP, or premium)
+✅ Audience reachable organically (social media, SEO, communities)
+✅ Room for improvement (outdated UI, missing features, bad UX)
 
-=== OUTPUT FORMAT (JSON ONLY, no markdown) ===
+A BAD DEAL has:
+❌ Requires enterprise sales or B2B partnerships
+❌ Dominated by big players with huge budgets
+❌ No clear monetization (purely free, ad-dependent)
+❌ Audience too niche or unreachable (doctors, lawyers, accountants...)
+❌ Requires specialized knowledge (medical, legal, financial compliance)
+❌ Requires real-world logistics (delivery, booking, inventory)
+
+=== STEP 1: SCAN ===
+Look at ALL apps and clusters. Identify patterns:
+- Which clusters have multiple apps ranking?
+- Which apps are from solo devs or small teams?
+- Which apps prove the market pays? (look for paid apps or clear freemium)
+
+=== STEP 2: FILTER ===
+For each potential niche, ask yourself:
+1. "Can I build this alone in 2-3 months?" → If no, ELIMINATE
+2. "Can I reach this audience on Twitter/TikTok/Reddit?" → If no, ELIMINATE
+3. "Are users ALREADY paying for this?" → If no proof, ELIMINATE
+4. "Is there room for a better version?" → If no, ELIMINATE
+5. "Do the apps actually solve the SAME problem?" → If not, ELIMINATE
+
+=== STEP 3: SELECT THE 2 BEST DEALS ===
+Pick the 2 niches with the strongest "indie opportunity signal":
+- Small dev proving it works
+- Clear monetization
+- Obvious gaps to exploit
+- Audience you can reach
+
+CRITICAL RULES:
+- Niche 1 and Niche 2 must be from DIFFERENT categories (not 2 fitness apps, not 2 productivity apps)
+- Apps within a niche must solve the SAME core problem (users of App A would want App B)
+- Name niches simply: "Sleep Sound Apps", "Calorie Trackers", "Bible Study Apps" - NOT jargon like "Wellness Optimization Tools"
+- EXCLUDE big corporations (Google, Apple, Meta, banks like N26/Revolut/PayPal, famous brands like Spotify/Netflix/Uber)
+- EXCLUDE B2B/professional tools (invoicing for X, CRM for Y, tools for doctors/lawyers/accountants)
+- NEVER use technical column names like "dev_app_count", "cluster_size" etc. Write naturally for humans.
+- Write EVERYTHING in ENGLISH
+
+=== OUTPUT FORMAT (JSON ONLY) ===
 {
-  "title": "Catchy, simple title with emoji that anyone can understand (max 60 chars). Example: 'Prayer Apps Are Exploding 📿' or 'Calorie Trackers Dominate 🔥'",
+  "title": "Catchy title with emoji, max 60 chars. Example: 'Sleep Apps Are Printing Money 💤'",
   "date": "${today}",
-  "hook": "One punchy sentence: what pattern did you find and why it matters. Use numbers.",
+  "hook": "One punchy sentence: what's the opportunity and why NOW. Use specific numbers from the data.",
   
   "niches": [
     {
-      "name": "Simple, clear niche name that anyone can understand. Examples: 'Bible & Prayer Apps', 'Calorie Trackers', 'Knitting Pattern Tools'. NO jargon like 'Smart Reference Utilities'.",
-      "emoji": "Relevant emoji",
-      "cluster_size": 6,
-      "intro": "1-2 lines explaining what this niche is about. Simple, clear definition for someone who doesn't know this market.",
-      "why_hot": "Why this niche is trending TODAY. Reference cluster size and specific apps. 2 sentences max.",
-      "gap": "What's MISSING in this niche? What could an indie dev do differently? Be specific.",
+      "name": "Simple 2-4 word niche name (e.g., 'White Noise Apps', 'Fasting Trackers')",
+      "emoji": "🎯",
+      "cluster_size": 5,
+      "intro": "1-2 sentences: What problem do these apps solve? Who uses them?",
+      "why_hot": "Why is this a good deal RIGHT NOW? Mention specific apps/ranks as proof. 2 sentences max.",
+      "gap": "What's WRONG with current apps? What would make users switch? Be specific and actionable.",
       "competition": 40,
       "potential": 85,
       "apps": [
         {
-          "name": "Real app name from the data",
-          "rank": 3,
+          "name": "App name from data",
+          "rank": 12,
           "country": "US",
           "flag": "🇺🇸",
           "dev_type": "indie",
-          "insight": "Why this app proves the opportunity. Say if it's a solo dev or small team, mention rank and countries. One punchy sentence. Explain why it's good to copy and how to improve it."
+          "insight": "Why this app PROVES the opportunity. Mention: dev size, rank, what's working, what could be better. One punchy sentence."
         },
         {
           "name": "Second app for niche 1",
-          "rank": 7,
-          "country": "IT",
-          "flag": "🇮🇹",
-          "dev_type": "indie",
-          "insight": "Why this app is interesting for this niche."
+          "rank": 8,
+          "country": "FR",
+          "flag": "🇫🇷",
+          "dev_type": "small_studio",
+          "insight": "What this app adds to the opportunity story."
         }
       ]
     },
     {
-      "name": "Simple, clear niche name (e.g., 'Walking Rewards Apps', 'Weather Widgets')",
+      "name": "Different category niche (e.g., 'Pet Care Reminders')",
       "emoji": "📱",
-      "cluster_size": 4,
-      "intro": "1-2 lines explaining this second niche.",
-      "why_hot": "Why this second niche is worth exploring.",
-      "gap": "The opportunity gap for indie devs.",
-      "competition": 55,
-      "potential": 75,
+      "cluster_size": 3,
+      "intro": "What's this niche about?",
+      "why_hot": "Why is this worth exploring?",
+      "gap": "The weakness to exploit.",
+      "competition": 35,
+      "potential": 70,
       "apps": [
         {
           "name": "One app for niche 2",
-          "rank": 12,
+          "rank": 15,
           "country": "DE",
           "flag": "🇩🇪",
-          "dev_type": "small_studio",
-          "insight": "Why this app illustrates the niche opportunity."
+          "dev_type": "indie",
+          "insight": "Why this app shows the opportunity."
         }
       ]
     }
   ],
   
-  "action": "MAX 15 WORDS. Must be DIRECTLY linked to Niche #1 above. Format: 'Build a [app from niche 1] for [market from the data] with [feature inspired by the gap]...' Use the REAL niche name and country from your analysis. STOP after 15 words."
+  "action": "MAX 15 WORDS. Specific next step tied to Niche #1. Format: 'Build a [specific app] for [audience] with [differentiator]...'"
 }
 
-IMPORTANT: 
-- Return ONLY the JSON, no text before or after
-- Niche 1 must have exactly 2 apps
-- Niche 2 must have exactly 1 app
-- Use REAL app names and data from the input
-- competition/potential are percentages (0-100)`;
+FINAL CHECKLIST (verify before responding):
+□ Both niches are from DIFFERENT categories
+□ All apps within a niche solve the SAME problem
+□ No B2B/professional niches
+□ No big corporation apps
+□ Clear monetization path exists for both niches
+□ An indie dev could realistically build and market this
+□ Niche 1 has exactly 2 apps, Niche 2 has exactly 1 app
+□ Output is valid JSON only, no markdown`;
 
   const response = await getOpenAI().chat.completions.create({
     model: 'gpt-5.1',

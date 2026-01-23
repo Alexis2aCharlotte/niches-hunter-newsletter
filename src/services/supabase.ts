@@ -268,7 +268,7 @@ export async function saveNewsletter(content: string, title: string): Promise<vo
  */
 export async function getActiveSubscribers(): Promise<Subscriber[]> {
   const { data, error } = await getSupabase()
-    .from('newsletter_subscribers_test')  // 🧪 TEST MODE - Revert to 'newsletter_subscribers' for production
+    .from('newsletter_subscribers')  // ✅ PRODUCTION MODE
     .select('*')
     .eq('status', 'subscribed');
 
