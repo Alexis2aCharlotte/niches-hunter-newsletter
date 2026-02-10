@@ -267,39 +267,63 @@ FINAL CHECKLIST (verify before responding):
 □ Niche 1 has exactly 2 apps, Niche 2 has exactly 1 app
 □ Output is valid JSON only, no markdown`;
 
-  const response = await getOpenAI().chat.completions.create({
-    model: 'gpt-5.1',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7,
-  });
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error('No response from OpenAI');
-  }
-
-  // Clean and parse JSON
-  let jsonText = content.trim();
-  jsonText = jsonText.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '');
+  const MAX_RETRIES = 3;
   
-  try {
-    const result = JSON.parse(jsonText) as NewsletterAnalysis;
-    
-    // Validate structure
-    if (!result.niches || result.niches.length !== 2) {
-      throw new Error('Expected exactly 2 niches');
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`   🔄 AI attempt ${attempt}/${MAX_RETRIES}...`);
+      
+      const response = await getOpenAI().chat.completions.create({
+        model: 'gpt-5.1',
+        messages: [
+          { role: 'system', content: 'You are a mobile app market analyst. Always respond with valid JSON only. No markdown, no code blocks, no extra text.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error('No response from OpenAI');
+      }
+
+      // Clean JSON (remove potential markdown wrappers just in case)
+      let jsonText = content.trim();
+      jsonText = jsonText.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '');
+
+      const result = JSON.parse(jsonText) as NewsletterAnalysis;
+      
+      // Validate structure
+      if (!result.niches || result.niches.length !== 2) {
+        throw new Error(`Expected exactly 2 niches, got ${result.niches?.length || 0}`);
+      }
+      if (!result.niches[0].apps || result.niches[0].apps.length !== 2) {
+        throw new Error(`Expected 2 apps for niche 1, got ${result.niches[0].apps?.length || 0}`);
+      }
+      if (!result.niches[1].apps || result.niches[1].apps.length !== 1) {
+        throw new Error(`Expected 1 app for niche 2, got ${result.niches[1].apps?.length || 0}`);
+      }
+      
+      console.log(`   ✅ AI response parsed successfully on attempt ${attempt}`);
+      return result;
+
+    } catch (error) {
+      console.error(`   ⚠️ Attempt ${attempt}/${MAX_RETRIES} failed:`, error instanceof Error ? error.message : error);
+      
+      if (attempt === MAX_RETRIES) {
+        console.error('   ❌ All retry attempts exhausted');
+        throw new Error(`Failed to get valid AI response after ${MAX_RETRIES} attempts: ${error}`);
+      }
+      
+      // Exponential backoff: 2s, 4s
+      const waitMs = 2000 * attempt;
+      console.log(`   ⏳ Retrying in ${waitMs / 1000}s...`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
     }
-    if (!result.niches[0].apps || result.niches[0].apps.length !== 2) {
-      throw new Error('Expected 2 apps for niche 1');
-    }
-    if (!result.niches[1].apps || result.niches[1].apps.length !== 1) {
-      throw new Error('Expected 1 app for niche 2');
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('Failed to parse AI response:', jsonText);
-    throw new Error(`Failed to parse AI response as JSON: ${error}`);
   }
+
+  // TypeScript safety - should never reach here
+  throw new Error('Unexpected: exhausted retries without returning or throwing');
 }
 
