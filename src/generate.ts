@@ -13,8 +13,11 @@
  * 5. Save newsletter to DB
  * 6. Save niche drafts (x2)
  * 7. Save cooldowns for used apps
- * 8. Send emails
- * 9. Notify Telegram
+ * 8. Notify Telegram
+ * 
+ * NOTE: Emails are NO LONGER sent from here.
+ * - New subscribers get the latest newsletter via SignUp service
+ * - Existing subscribers get a digest via Digest service (2-3x/week)
  */
 
 import dotenv from 'dotenv';
@@ -23,14 +26,12 @@ dotenv.config();
 import { 
   getDailyPicks, 
   saveNewsletter, 
-  getActiveSubscribers,
   getAppsInCooldown,
   saveNicheDraft,
   saveNicheCooldowns
 } from './services/supabase';
 import { formatDataForAI, analyzeWithAI, NewsletterAnalysis } from './services/openai';
 import { generateNewsletterHTML } from './templates/newsletter';
-import { sendNewsletterBatch } from './services/email';
 import { notifyTelegram } from './services/telegram';
 
 /**
@@ -197,27 +198,10 @@ export async function generateNewsletter(): Promise<void> {
     console.log('');
 
     // =========================================
-    // Step 9: Get active subscribers
+    // Step 9: Notify via Telegram
     // =========================================
-    console.log('👥 Step 9: Fetching active subscribers...');
-    const subscribers = await getActiveSubscribers();
-    const emails = subscribers.map(s => s.email);
-    console.log(`   ✅ Found ${emails.length} active subscribers`);
-    console.log('');
-
-    // =========================================
-    // Step 10: Send emails
-    // =========================================
-    console.log('📧 Step 10: Sending emails...');
-    const { success, failed } = await sendNewsletterBatch(emails, html, analysis.title);
-    console.log(`   ✅ Sent: ${success} | ❌ Failed: ${failed}`);
-    console.log('');
-
-    // =========================================
-    // Step 11: Notify via Telegram
-    // =========================================
-    console.log('📱 Step 11: Sending Telegram notification...');
-    const telegramMessage = `📰 Newsletter Sent!
+    console.log('📱 Step 9: Sending Telegram notification...');
+    const telegramMessage = `📰 Newsletter Generated (saved, not sent)
 
 📌 ${analysis.title}
 
@@ -226,12 +210,10 @@ export async function generateNewsletter(): Promise<void> {
 • ${analysis.niches[1]?.name} (${niche2AppIds.length} apps)
 
 📊 Stats:
-• Subscribers: ${emails.length}
-• Sent: ${success}
-• Failed: ${failed}
 • Apps in cooldown: ${totalCooldowns} new
+• HTML: ${html.length} chars
 
-${failed > 0 ? '⚠️ Check logs for failed emails' : '✅ All sent!'}`;
+✅ Saved to newsletters_v2 (Digest service will send to subscribers)`;
 
     await notifyTelegram(telegramMessage);
     console.log('   ✅ Telegram notification sent');
